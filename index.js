@@ -1,0 +1,31 @@
+import express from 'express';
+import cors from 'cors';
+import { config } from './src/config.js';
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static UI files from public directory if present
+app.use(express.static('public'));
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'online',
+    system: 'Multi-Document RAG QA System',
+    timestamp: new Date().toISOString()
+  });
+});
+
+const PORT = config.port || 3000;
+
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`🚀 RAG Server listening on http://localhost:${PORT}`);
+  });
+}
+
+export default app;
