@@ -10,10 +10,16 @@ export const config = {
   // LLM Provider settings
   llmProvider: process.env.LLM_PROVIDER || 'groq',
   groqApiKey: process.env.GROQ_API_KEY || '',
-  groqModel: process.env.GROQ_MODEL || 'llama-3.1-8b-instant',
+  // Available Groq models: 'gpt-oss-120b', 'gpt-oss-20b', 'qwen-qwq-32b'
+  groqModel: process.env.GROQ_MODEL || 'gpt-oss-20b',
   
   openaiApiKey: process.env.OPENAI_API_KEY || '',
   openaiModel: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+
+  // Embedding Provider settings
+  // 'local' = TF-IDF style local embeddings (zero API cost, no key needed)
+  // 'openai' = OpenAI text-embedding-3-small
+  embeddingProvider: process.env.EMBEDDING_PROVIDER || 'local',
   
   // Vector DB settings
   vectorDbType: process.env.VECTOR_DB_TYPE || 'memory',
