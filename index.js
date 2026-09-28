@@ -1,8 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import { config } from './src/config.js';
+import { initDatabase } from './src/database/relational.js';
 
 const app = express();
+
+// Initialize Database
+await initDatabase();
 
 app.use(cors());
 app.use(express.json());
