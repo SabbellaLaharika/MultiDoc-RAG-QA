@@ -15,6 +15,8 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static UI files from public directory if present
 app.use(express.static('public'));
 
+import uploadRouter from './src/api/upload.js';
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({
@@ -23,6 +25,8 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+
+app.use('/api/upload', uploadRouter);
 
 const PORT = config.port || 3000;
 
