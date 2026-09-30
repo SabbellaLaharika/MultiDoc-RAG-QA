@@ -16,6 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 import uploadRouter from './src/api/upload.js';
+import chatRouter from './src/api/chat.js';
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -27,6 +28,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/upload', uploadRouter);
+app.use('/api/chat', chatRouter);
 
 const PORT = config.port || 3000;
 
