@@ -27,7 +27,9 @@ export const config = {
   vectorDbApiKey: process.env.VECTOR_DB_API_KEY || '',
   
   // Similarity & Search settings
-  similarityThreshold: parseFloat(process.env.SIMILARITY_THRESHOLD || '0.70'),
+  // NOTE: 0.20 is appropriate for local hashing-trick embeddings which are sparse.
+  // For OpenAI dense embeddings (text-embedding-3-small), use 0.60-0.75.
+  similarityThreshold: parseFloat(process.env.SIMILARITY_THRESHOLD || '0.20'),
   topK: parseInt(process.env.TOP_K || '3', 10),
   
   // Database URL

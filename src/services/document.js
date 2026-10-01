@@ -30,11 +30,49 @@ export async function parsePdfBuffer(fileBuffer, filename) {
   try {
     await pdfParse(fileBuffer, { pagerender: renderPage });
   } catch (error) {
-    console.error(`Error parsing PDF ${filename}:`, error.message);
-    throw new Error(`Failed to parse PDF file "${filename}": ${error.message}`);
+    console.warn(`Warning: Custom page render failed for ${filename}, attempting fallback parsing. Error: ${error.message}`);
+    // First fallback: generic pdf-parse
+    try {
+      const data = await pdfParse(fileBuffer);
+      if (data.text && data.text.trim().length > 0) {
+        pages.push({
+          pageNumber: 1,
+          text: data.text.replace(/\s+/g, ' ').trim()
+        });
+      }
+    } catch (fallbackError) {
+      // Second fallback: use pdfjs-dist to extract text from each page
+      try {
+        const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
+        // pdfjs-dist requires Uint8Array, not Node Buffer
+        const uint8Data = new Uint8Array(fileBuffer);
+        const loadingTask = pdfjsLib.getDocument({ data: uint8Data });
+        const pdfDoc = await loadingTask.promise;
+        const numPages = pdfDoc.numPages;
+        for (let i = 1; i <= numPages; i++) {
+          const page = await pdfDoc.getPage(i);
+          const textContent = await page.getTextContent();
+          let pageText = '';
+          for (const item of textContent.items) {
+            pageText += item.str + ' ';
+          }
+          const cleaned = pageText.replace(/\s+/g, ' ').trim();
+          if (cleaned.length > 0) {
+            pages.push({
+              pageNumber: i,
+              text: cleaned
+            });
+          }
+        }
+      } catch (pdfjsError) {
+        // Re-throw original error for visibility
+        throw new Error(`Failed to parse PDF file "${filename}": ${error.message}`);
+      }
+    }
   }
 
-  // Fallback: If pagerender didn't populate pages, use standard pdfParse output
+
+  // Fallback: If pagerender didn't populate pages but didn't throw, use standard pdfParse output
   if (pages.length === 0) {
     const data = await pdfParse(fileBuffer);
     if (data.text && data.text.trim().length > 0) {

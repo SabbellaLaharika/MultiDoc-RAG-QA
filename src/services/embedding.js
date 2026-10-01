@@ -17,17 +17,33 @@ import { config } from '../config.js';
 
 const LOCAL_DIM = 384; // Vector dimensionality for local embeddings
 
+// ─── Stopwords ───────────────────────────────────────────────────────────────
+
+/**
+ * Common English stopwords — no semantic discriminative value for local embeddings.
+ * Filtering them prevents out-of-scope queries from falsely matching domain documents.
+ */
+const STOPWORDS = new Set([
+  'a','an','the','and','or','but','in','on','at','to','for','of','with',
+  'by','from','is','are','was','were','be','been','being','have','has','had',
+  'do','does','did','will','would','could','should','may','might','shall',
+  'it','its','this','that','these','those','me','him','her','us','them',
+  'my','your','his','our','their','what','which','who','when','where','how',
+  'all','not','no','so','as','if','up','out','about','into','than','then',
+  'now','just','also','more','most','any','each','very','such','some'
+]);
+
 // ─── Utility helpers ─────────────────────────────────────────────────────────
 
 /**
- * Tokenise a string into normalised lowercase word tokens
+ * Tokenise a string into normalised lowercase word tokens, filtering stopwords.
  */
 function tokenise(text) {
   return text
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, ' ')
     .split(/\s+/)
-    .filter(t => t.length > 1);
+    .filter(t => t.length > 1 && !STOPWORDS.has(t));
 }
 
 /**
