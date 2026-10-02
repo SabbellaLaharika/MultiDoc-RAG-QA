@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Doc RAG AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brain"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5A3 3 0 0 0 13.6 4.4"/><path d="M6.401 6.5A3 3 0 0 1 10.4 4.4"/></svg>
+        <h1>Multi-Doc RAG AI</h1>
+      </div>
+      <div class="header-status" id="system-status">
+        <span class="status-dot online"></span> System Online
+      </div>
+    </header>
+
+    <main class="main-layout">
+      
+      <!-- Upload Section -->
+      <section class="panel upload-panel glass">
+        <h2>Knowledge Base</h2>
+        <p class="subtitle">Upload PDFs and DOCX files to build context.</p>
+        
+        <div class="drop-zone" id="drop-zone">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload-cloud drop-icon"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>
+          <p>Drag & drop files here, or <span class="browse-btn" id="browse-btn">browse</span></p>
+          <input type="file" id="file-input" multiple accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+        </div>
+
+        <div class="file-list" id="file-list">
+          <!-- Files will be injected here -->
+        </div>
+
+        <button class="primary-btn" id="upload-btn" disabled>
+          <span class="btn-text">Ingest Documents</span>
+          <div class="spinner hidden" id="upload-spinner"></div>
+        </button>
+
+        <div class="upload-status" id="upload-status"></div>
+      </section>
+
+      <!-- Chat Section -->
+      <section class="panel chat-panel glass">
+        <div class="chat-header">
+          <h2>Assistant</h2>
+          <button class="icon-btn" id="clear-chat-btn" title="Clear Chat">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+          </button>
+        </div>
+
+        <div class="chat-history" id="chat-history">
+          <div class="message assistant welcome">
+            <div class="message-avatar">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+            </div>
+            <div class="message-content">
+              Hello! I am your AI assistant. Upload some documents on the left, and ask me questions about them!
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input-container">
+          <textarea id="chat-input" placeholder="Ask a question about your documents..." rows="1"></textarea>
+          <button class="send-btn" id="send-btn" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+          </button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Citation Modal -->
+  <div class="modal-overlay hidden" id="citation-modal">
+    <div class="modal glass">
+      <div class="modal-header">
+        <h3>Citations</h3>
+        <button class="close-btn" id="close-modal-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-content" id="citation-content">
+        <!-- Citations injected here -->
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -7,7 +7,7 @@ import path from 'path';
  */
 export async function parsePdfBuffer(fileBuffer, filename) {
   const pages = [];
-  
+
   // Custom pagerender to capture page index and raw text per page
   function renderPage(pageData) {
     return pageData.getTextContent()
@@ -46,7 +46,11 @@ export async function parsePdfBuffer(fileBuffer, filename) {
         const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
         // pdfjs-dist requires Uint8Array, not Node Buffer
         const uint8Data = new Uint8Array(fileBuffer);
-        const loadingTask = pdfjsLib.getDocument({ data: uint8Data });
+        const standardFontDataUrl = path.join(process.cwd(), 'node_modules', 'pdfjs-dist', 'standard_fonts') + '/';
+        const loadingTask = pdfjsLib.getDocument({
+          data: uint8Data,
+          standardFontDataUrl: standardFontDataUrl
+        });
         const pdfDoc = await loadingTask.promise;
         const numPages = pdfDoc.numPages;
         for (let i = 1; i <= numPages; i++) {
