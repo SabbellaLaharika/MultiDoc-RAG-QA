@@ -13,7 +13,7 @@ const docxPath = path.resolve(process.cwd(), 'tests', 'sample_docs', 'contractor
 test('Phase 8: End-to-End RAG Integration', async (t) => {
   // Clear databases before E2E tests
   t.before(async () => {
-    clearVectorStore();
+    await clearVectorStore();
     const db = getDbConnection();
     await new Promise((resolve) => db.run('DELETE FROM messages', resolve));
     await new Promise((resolve) => db.run('DELETE FROM sessions', resolve));
@@ -34,7 +34,7 @@ test('Phase 8: End-to-End RAG Integration', async (t) => {
     assert.equal(res.body.documentsProcessed, 2);
     
     // Check that vector chunks were generated and stored
-    assert.ok(getVectorCount() > 0, 'Vector store should contain extracted chunks');
+    assert.ok((await getVectorCount()) > 0, 'Vector store should contain extracted chunks');
   });
 
   await t.test('E2E: Should retrieve valid answers and citations for Employee PTO (PDF)', async () => {

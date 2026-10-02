@@ -54,18 +54,18 @@ test('Phase 4: Embedding Engine', async (t) => {
 
 test('Phase 4: Vector Store', async (t) => {
   // Clear store before each test group to isolate state
-  t.beforeEach(() => clearVectorStore());
+  t.beforeEach(async () => { await clearVectorStore(); });
 
   await t.test('upsertVector should store and count a single record', async () => {
     const vec = await embedText('Sample PTO policy text.');
-    upsertVector('chunk_1', vec, {
+    await upsertVector('chunk_1', vec, {
       text: 'Sample PTO policy text.',
       filename: 'employee_handbook.pdf',
       page_number: 14,
       document_id: 'doc_001',
       chunk_index: 0
     });
-    assert.equal(getVectorCount(), 1);
+    assert.equal(await getVectorCount(), 1);
   });
 
   await t.test('upsertVectors should store multiple records in batch', async () => {
@@ -80,8 +80,8 @@ test('Phase 4: Vector Store', async (t) => {
       vector,
       metadata: { text: texts[i], filename: `doc${i}.pdf`, page_number: i + 1, document_id: 'doc_002', chunk_index: i }
     }));
-    upsertVectors(records);
-    assert.equal(getVectorCount(), 3);
+    await upsertVectors(records);
+    assert.equal(await getVectorCount(), 3);
   });
 
   await t.test('similaritySearch should return top-K results above threshold', async () => {
@@ -92,14 +92,14 @@ test('Phase 4: Vector Store', async (t) => {
     ];
 
     const vecs = await embedBatch(docs.map(d => d.text));
-    upsertVectors(docs.map((d, i) => ({
+    await upsertVectors(docs.map((d, i) => ({
       id: d.id,
       vector: vecs[i],
       metadata: { text: d.text, filename: 'handbook.pdf', page_number: d.page, document_id: 'doc_003', chunk_index: i }
     })));
 
     const queryVec = await embedText('How many vacation days do employees receive?');
-    const results = similaritySearch(queryVec, 3, 0.0); // threshold=0 to capture all
+    const results = await similaritySearch(queryVec, 3, 0.0); // threshold=0 to capture all
 
     assert.ok(results.length > 0);
     // Scores must be in descending order
@@ -112,26 +112,26 @@ test('Phase 4: Vector Store', async (t) => {
 
   await t.test('similaritySearch should return empty array when scores are below threshold', async () => {
     const vec = await embedText('Database schema design patterns.');
-    upsertVector('chunk_x', vec, {
+    await upsertVector('chunk_x', vec, {
       text: 'Database schema design patterns.',
       filename: 'tech.pdf', page_number: 1, document_id: 'doc_004', chunk_index: 0
     });
 
     // Query about a completely unrelated topic with a very high threshold
     const queryVec = await embedText('What is the capital of France?');
-    const results = similaritySearch(queryVec, 3, 0.999); // impossibly high threshold
+    const results = await similaritySearch(queryVec, 3, 0.999); // impossibly high threshold
 
     assert.equal(results.length, 0);
   });
 
   await t.test('deleteDocumentVectors should remove all chunks for a document', async () => {
     const vec = await embedText('Test content for deletion.');
-    upsertVector('del_chunk_1', vec, { text: 'Test', filename: 'del.pdf', page_number: 1, document_id: 'doc_del', chunk_index: 0 });
-    upsertVector('del_chunk_2', vec, { text: 'Test', filename: 'del.pdf', page_number: 2, document_id: 'doc_del', chunk_index: 1 });
-    upsertVector('keep_chunk_1', vec, { text: 'Keep', filename: 'keep.pdf', page_number: 1, document_id: 'doc_keep', chunk_index: 0 });
+    await upsertVector('del_chunk_1', vec, { text: 'Test', filename: 'del.pdf', page_number: 1, document_id: 'doc_del', chunk_index: 0 });
+    await upsertVector('del_chunk_2', vec, { text: 'Test', filename: 'del.pdf', page_number: 2, document_id: 'doc_del', chunk_index: 1 });
+    await upsertVector('keep_chunk_1', vec, { text: 'Keep', filename: 'keep.pdf', page_number: 1, document_id: 'doc_keep', chunk_index: 0 });
 
-    assert.equal(getVectorCount(), 3);
-    deleteDocumentVectors('doc_del');
-    assert.equal(getVectorCount(), 1);
+    assert.equal(await getVectorCount(), 3);
+    await deleteDocumentVectors('doc_del');
+    assert.equal(await getVectorCount(), 1);
   });
 });

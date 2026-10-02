@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
     const queryVector = await embedText(query);
 
     // 4. Perform vector similarity search
-    const contextChunks = similaritySearch(queryVector);
+    const contextChunks = await similaritySearch(queryVector);
 
     // 5. Generate answer using LLM
     const { answer, citations } = await generateAnswer(query, contextChunks, history);

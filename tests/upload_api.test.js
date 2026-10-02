@@ -6,8 +6,8 @@ import { clearVectorStore, getVectorCount } from '../src/database/vector_store.j
 import { getAllDocuments } from '../src/database/relational.js';
 
 test('Phase 5: Document Upload API Endpoint', async (t) => {
-  t.beforeEach(() => {
-    clearVectorStore();
+  t.beforeEach(async () => {
+    await clearVectorStore();
   });
 
   await t.test('POST /api/upload should reject request with no files', async () => {
@@ -37,7 +37,7 @@ test('Phase 5: Document Upload API Endpoint', async (t) => {
     assert.ok(res.body.details[0].chunks > 0);
 
     // Verify vector store has chunks
-    assert.ok(getVectorCount() > 0);
+    assert.ok((await getVectorCount()) > 0);
 
     // Verify relational DB has the document
     const docs = await getAllDocuments();

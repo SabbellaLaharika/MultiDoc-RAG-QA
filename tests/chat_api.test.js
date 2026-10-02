@@ -9,7 +9,7 @@ import { embedText } from '../src/services/embedding.js';
 test('Phase 7: Chat API Endpoint', async (t) => {
   // Clear databases before tests
   t.beforeEach(async () => {
-    clearVectorStore();
+    await clearVectorStore();
     const db = getDbConnection();
     await new Promise((resolve) => db.run('DELETE FROM messages', resolve));
     await new Promise((resolve) => db.run('DELETE FROM sessions', resolve));
@@ -28,7 +28,7 @@ test('Phase 7: Chat API Endpoint', async (t) => {
     // to ensure the local TF-IDF embedding score passes the default 0.70 threshold.
     const text = 'How many days of PTO do employees get? Employees receive 20 days.';
     const vector = await embedText(text);
-    upsertVector('chunk_1', vector, {
+    await upsertVector('chunk_1', vector, {
       text,
       filename: 'handbook.pdf',
       page_number: 14,

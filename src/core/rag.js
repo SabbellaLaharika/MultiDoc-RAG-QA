@@ -63,7 +63,7 @@ export async function ingestDocument(fileBuffer, filename, mimeType) {
       chunk_index: chunk.chunk_index
     }
   }));
-  upsertVectors(vectorRecords);
+  await upsertVectors(vectorRecords);
 
   // ── Step 5: Log document metadata into Relational DB ─────────────────────
   await createDocument({

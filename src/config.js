@@ -22,9 +22,10 @@ export const config = {
   embeddingProvider: process.env.EMBEDDING_PROVIDER || 'local',
   
   // Vector DB settings
-  vectorDbType: process.env.VECTOR_DB_TYPE || 'memory',
+  vectorDbType: process.env.VECTOR_DB_TYPE || 'memory', // 'memory' or 'pinecone'
   vectorDbUrl: process.env.VECTOR_DB_URL || '',
-  vectorDbApiKey: process.env.VECTOR_DB_API_KEY || '',
+  vectorDbApiKey: process.env.VECTOR_DB_API_KEY || process.env.PINECONE_API_KEY || '',
+  pineconeIndex: process.env.PINECONE_INDEX || 'multidoc-rag',
   
   // Similarity & Search settings
   // NOTE: 0.20 is appropriate for local hashing-trick embeddings which are sparse.
