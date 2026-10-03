@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  rag-api:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./uploads:/usr/src/app/uploads
+      - ./rag_history.db:/usr/src/app/rag_history.db
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped
