@@ -96,3 +96,20 @@ curl -X POST http://localhost:3000/api/chat \
   -H "Content-Type: application/json" \
   -d '{"query": "What is the company PTO policy?", "session_id": "session-123"}'
 ```
+
+## Demo Screenshots
+
+### 1. Uploading Documents
+![Uploading Documents](assets/Uploading-documents.png)
+
+### 2. Document Ingestion & Processing
+![Document Ingestion](assets/Document-ingestion.png)
+
+### 3. Q&A with Verifiable Citations
+![Citations](assets/Citations.png)
+
+### 4. Conversational Follow-up
+![Conversation Follow-up](assets/Conversation-follow-up.png)
+
+### 5. Graceful Failure (Hallucination Prevention)
+![Graceful Failure](assets/Graceful-Failure.png)
